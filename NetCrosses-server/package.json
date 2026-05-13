@@ -1,0 +1,22 @@
+{
+  "name": "netcrosses-server",
+  "version": "0.1.0",
+  "private": true,
+  "description": "NetCrosses server and CLI client for TCP-only tunneling.",
+  "main": "dist/server/index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start:server": "node dist/server/index.js --config config/server.example.toml",
+    "start:client": "node dist/client/index.js --config config/client.example.toml"
+  },
+  "engines": {
+    "node": ">=20.0.0"
+  },
+  "dependencies": {
+    "@iarna/toml": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "^5.4.0"
+  }
+}

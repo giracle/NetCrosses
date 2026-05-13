@@ -1,0 +1,7 @@
+[server]
+bind_addr = "0.0.0.0"
+bind_port = 7001
+token = "自己设定即可，需要在软件中输入这里的秘钥"
+tunnel_port_min = 10000
+tunnel_port_max = 10099
+log_level = "info"

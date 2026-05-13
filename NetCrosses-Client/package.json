@@ -1,0 +1,78 @@
+{
+  "name": "netcrosses",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cross-platform desktop client for NetCrosses.",
+  "author": "ihuan <giracle@yeah.net>",
+  "homepage": "https://github.com/giracle/netcrosses",
+  "main": "dist/main/index.js",
+  "scripts": {
+    "dev": "npm run build:main && electron .",
+    "build:main": "tsc -p tsconfig.json",
+    "build": "npm run build:main",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "dist:win": "npm run build:main && electron-builder --win",
+    "dist:linux": "npm run build:main && electron-builder --linux --x64"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "@typescript-eslint/eslint-plugin": "^7.2.0",
+    "@typescript-eslint/parser": "^7.2.0",
+    "electron": "^30.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.0",
+    "vitest": "^1.5.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "@iarna/toml": "^3.0.0"
+  },
+  "build": {
+    "appId": "com.netcrosses.client",
+    "productName": "NetCrosses",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "dist/**/*",
+      "src/renderer/**/*",
+      "assets/**/*",
+      "package.json"
+    ],
+    "asar": true,
+    "win": {
+      "icon": "assets/netcrosses.ico",
+      "target": ["nsis", "portable"]
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "assets/netcrosses.ico",
+      "uninstallerIcon": "assets/netcrosses.ico",
+      "installerHeaderIcon": "assets/netcrosses.ico"
+    },
+    "linux": {
+      "icon": "assets/netcrosses.png",
+      "target": ["deb", "AppImage"],
+      "category": "Utility"
+    },
+    "deb": {
+      "depends": [
+        "libgtk-3-0",
+        "libnotify4",
+        "libnss3",
+        "libxss1",
+        "libxtst6",
+        "xdg-utils",
+        "libatspi2.0-0",
+        "libsecret-1-0"
+      ]
+    }
+  }
+}

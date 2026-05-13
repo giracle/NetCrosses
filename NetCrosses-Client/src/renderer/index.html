@@ -1,0 +1,208 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>NetCrosses</title>
+    <link rel="stylesheet" href="./style.css" />
+    <script defer src="./renderer.js"></script>
+  </head>
+  <body>
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-brand">
+        <h1><span class="logo">N</span> NetCrosses</h1>
+        <div class="version">v0.1.0</div>
+      </div>
+      <nav class="sidebar-nav">
+        <button class="nav-item active" data-nav="connection">
+          <span class="icon">&#9889;</span>
+          连接
+        </button>
+        <button class="nav-item" data-nav="tunnels">
+          <span class="icon">&#128246;</span>
+          隧道映射
+        </button>
+        <button class="nav-item" data-nav="firewall">
+          <span class="icon">&#128736;</span>
+          防火墙
+        </button>
+        <button class="nav-item" data-nav="logs">
+          <span class="icon">&#128203;</span>
+          日志
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="connection-mini">
+          <div class="dot" id="sidebarDot"></div>
+          <div class="info">
+            <div class="label">连接状态</div>
+            <div class="value" id="sidebarStatus">空闲</div>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main">
+      <header class="topbar">
+        <h1 class="topbar-title" id="pageTitle">连接设置</h1>
+        <div class="topbar-actions">
+          <button class="theme-toggle" id="themeToggle" title="切换主题">&#9788;</button>
+          <button class="btn btn-secondary" id="importTomlBtn">导入配置</button>
+          <button class="btn btn-secondary" id="exportTomlBtn">导出配置</button>
+          <button class="btn btn-primary" id="startBtn">&#9654; 启动连接</button>
+          <button class="btn btn-danger" id="stopBtn" style="display:none">&#9632; 停止</button>
+        </div>
+      </header>
+
+      <div class="content">
+        <div class="content-inner">
+
+          <!-- Status Banner -->
+          <div class="status-banner" id="statusBanner">
+            <div class="status-icon idle" id="statusIcon">&#9679;</div>
+            <div class="status-details">
+              <div class="state" id="statusText">空闲</div>
+              <div class="hint" id="statusHint">等待操作。</div>
+            </div>
+            <div class="status-meta" id="statusMeta" style="display:none">
+              <div class="uptime" id="statusUptime"></div>
+              <div class="latency" id="statusLatency"></div>
+            </div>
+          </div>
+
+          <!-- Connection Settings -->
+          <div class="card" data-page="connection">
+            <div class="card-header">
+              <div>
+                <h2>服务器配置</h2>
+                <p>控制通道连接参数</p>
+              </div>
+              <button class="btn btn-secondary" id="quickTestBtn">快速检测</button>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>服务器地址</label>
+                  <input id="serverAddr" type="text" placeholder="例如: 云服务器IP地址" />
+                </div>
+                <div class="form-group">
+                  <label>服务器端口</label>
+                  <input id="serverPort" type="number" min="1" max="65535" />
+                </div>
+                <div class="form-group full">
+                  <label>访问令牌</label>
+                  <input id="token" type="password" placeholder="请输入访问令牌" />
+                </div>
+                <div class="form-group">
+                  <label>客户端名称</label>
+                  <input id="clientName" type="text" placeholder="NetCrosses-桌面端" />
+                </div>
+                <div class="form-group">
+                  <label>心跳间隔 (ms)</label>
+                  <input id="heartbeatInterval" type="number" min="1000" step="500" />
+                </div>
+                <div class="form-group">
+                  <label>重连延迟 (ms)</label>
+                  <input id="reconnectDelay" type="number" min="500" step="500" />
+                </div>
+              </div>
+
+              <div class="toggle-group" style="margin-top: 20px;">
+                <label class="toggle-item">
+                  <input id="autoStart" type="checkbox" />
+                  <span>应用启动后自动连接</span>
+                </label>
+                <label class="toggle-item">
+                  <input id="startOnLogin" type="checkbox" />
+                  <span>开机自启</span>
+                </label>
+                <label class="toggle-item">
+                  <input id="trayEnabled" type="checkbox" />
+                  <span>托盘驻留模式</span>
+                </label>
+              </div>
+
+              <div style="margin-top: 20px; display: flex; gap: 10px;">
+                <button class="btn btn-primary" id="saveBtn">保存配置</button>
+                <button class="btn btn-secondary" id="deepTestBtn">深度检测</button>
+              </div>
+              <p id="validationSummary" class="validation-summary"></p>
+            </div>
+          </div>
+
+          <!-- Tunnel Mapping -->
+          <div class="card" data-page="tunnels">
+            <div class="card-header">
+              <div>
+                <h2>隧道映射</h2>
+                <p>将本地端口映射到固定公网端口</p>
+              </div>
+              <button class="btn btn-primary" id="addTunnelBtn">+ 新增映射</button>
+            </div>
+            <div class="card-body">
+              <div class="tunnel-grid" id="tunnelsGrid">
+                <!-- Tunnel cards will be rendered here -->
+                <button class="add-tunnel" id="addTunnelCardBtn">
+                  <span class="icon">+</span>
+                  <span>添加新映射</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Firewall -->
+          <div class="card" data-page="firewall">
+            <div class="card-header">
+              <div>
+                <h2>防火墙助手</h2>
+                <p>生成端口放行命令（仅生成，不自动执行）</p>
+              </div>
+              <span class="badge badge-info" id="platformLabel">当前系统：检测中</span>
+            </div>
+            <div class="card-body">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>控制端口</label>
+                  <input id="fwControlPort" type="number" min="1" max="65535" />
+                </div>
+                <div class="form-group">
+                  <label>映射端口起</label>
+                  <input id="fwRangeStart" type="number" min="1" max="65535" />
+                </div>
+                <div class="form-group">
+                  <label>映射端口止</label>
+                  <input id="fwRangeEnd" type="number" min="1" max="65535" />
+                </div>
+                <div class="form-group full">
+                  <label>额外端口（可选，逗号分隔）</label>
+                  <input id="fwExtraPorts" type="text" placeholder="22, 80, 443" />
+                </div>
+              </div>
+              <pre id="fwOutput" class="code-block" style="margin-top: 16px;"></pre>
+              <p class="helper-text">提示：命令需要管理员权限，macOS 建议优先通过系统设置允许传入。</p>
+            </div>
+          </div>
+
+          <!-- Logs -->
+          <div class="card" data-page="logs">
+            <div class="card-header">
+              <div>
+                <h2>实时日志</h2>
+                <p>控制通道与代理活动</p>
+              </div>
+              <button class="btn btn-ghost" id="clearLogsBtn">清空日志</button>
+            </div>
+            <div class="card-body" style="padding: 0;">
+              <div id="logsList" class="logs-container">
+                <!-- Logs will be rendered here -->
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </body>
+</html>
